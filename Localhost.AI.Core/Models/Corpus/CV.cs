@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Localhost.AI.Core.Models.Corpus
+﻿namespace Localhost.AI.Core.Models.Corpus
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+
     public class Cv : EntityBase
     {
+        public string Title { get; set; }
         public string LastName { get; set; }
         public string FirstName { get; set; }
         public string Email { get; set; }
@@ -22,6 +23,7 @@ namespace Localhost.AI.Core.Models.Corpus
         public List<Education> Educations { get; set; }
         public List<Experience> Experiences { get; set; }   
         public List<string> Skills { get; set; }
+        public List<Creation> Creations { get; set; }
     }
 
     public class Experience

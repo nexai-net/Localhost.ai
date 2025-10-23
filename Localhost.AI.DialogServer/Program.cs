@@ -282,6 +282,24 @@
                 return Task.FromResult(result);
             });
 
+            app.MapPost("/cv/rewrite", (CvRewriteRequest c) =>
+            {
+                Cv result = new Cv()  ;
+                string myid = result.Id;
+                try
+                {
+                    Cv existingCv = _session.CvLoad(c.id);                    
+                    result = existingCv;
+                    result.Id = myid;
+                    result.Title = "VOILOUUUUU";
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+                return Task.FromResult(result);
+            });
+
             app.MapPost("/news", (NewsParamater mode) =>
             {
                 ///TODO : implement a real news fetcher
