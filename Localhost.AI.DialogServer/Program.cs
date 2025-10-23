@@ -74,6 +74,9 @@
             var app = builder.Build();
             app.UseSwagger();
 
+
+            #region "API Endpoints"
+
             app.MapPost("v1/chat/completions", async (Request d, [FromServices] IDemocriteExecutionHandler handler) =>
             {
                 Console.WriteLine("Received request for /v1/chat/completions");
@@ -90,7 +93,7 @@
                     };
                     d.messages.Insert(0, systemMessage);
                 }
-
+                
                 Completion c = LanguageModelManager.InitializeCompletion();
                 c.language = _config.Language;
                 c.request = d;
@@ -216,6 +219,69 @@
                 return Task.FromResult(result);
             });
 
+            app.MapPost("/cv/save", (Cv p) =>
+            {
+                ServiceReturn result = new ServiceReturn();
+                result.ReturnedId = "";
+                result.Message = "";
+                try
+                {
+                    result.ReturnedId = _session.CvSave(p);
+                }
+                catch (Exception ex)
+                {
+                    result.ReturnedId = "-1";
+                    result.Message = ex.Message;
+                }
+                return Task.FromResult(result);
+            });
+            
+            app.MapPost("/cv/load", (SearchId p) =>
+            {
+                Cv result = new Cv();
+                try
+                {
+                    result = _session.CvLoad(p.Id);
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+                return Task.FromResult(result);
+            });
+            
+            app.MapPost("/cv/search", (SearchId p) =>
+            {
+                List<Cv> result = new List<Cv>();
+                try
+                {
+                    result = _session.CvSearch(p.Criteria);
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                return Task.FromResult(result);
+            });
+            
+            app.MapPost("/cv/delete", (SearchId p) =>
+            {
+                ServiceReturn result = new ServiceReturn();
+                result.ReturnedId = "";
+                result.Message = "";
+                try
+                {
+                    result.ReturnedId = _session.CvDelete(p.Id);
+                    result.Message = "CV deleted successfully";
+                }
+                catch (Exception ex)
+                {
+                    result.ReturnedId = "-1";
+                    result.Message = ex.Message;
+                }
+                return Task.FromResult(result);
+            });
+
             app.MapPost("/news", (NewsParamater mode) =>
             {
                 ///TODO : implement a real news fetcher
@@ -277,6 +343,20 @@
                 return Task.FromResult(result);
             });
 
+            app.MapPost("/symbolicprocessor/load", (SearchId p) =>
+            {
+                SymbolicProcessor result = new SymbolicProcessor();
+                try
+                {
+                    result = _session.SymbolicProcessorLoad(p.Id);
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+                return Task.FromResult(result);
+            });
+
             app.MapPost("/symbolicencoder/save", (SymbolicEncoder p) =>
             {
                 ServiceReturn result = new ServiceReturn();
@@ -303,6 +383,23 @@
                 try
                 {
                     result.ReturnedId = _session.SymbolicDecoderSave(p);
+                }
+                catch (Exception ex)
+                {
+                    result.ReturnedId = "-1";
+                    result.Message = ex.Message;
+                }
+                return Task.FromResult(result);
+            });
+
+            app.MapPost("/symbolicprocessor/save", (SymbolicProcessor p) =>
+            {
+                ServiceReturn result = new ServiceReturn();
+                result.ReturnedId = "";
+                result.Message = "";
+                try
+                {
+                    result.ReturnedId = _session.SymbolicProcessorSave(p);
                 }
                 catch (Exception ex)
                 {
@@ -339,7 +436,23 @@
                     throw ex;
                 }
                 return Task.FromResult(result);
+            });  
+
+            app.MapPost("/symbolicprocessor/search", (SearchId p) =>
+            {
+                List<SymbolicProcessor> result = new List<SymbolicProcessor>();
+                try
+                {
+                    result = _session.SymbolicProcessorsSearch(p.Criteria);
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                return Task.FromResult(result);
             });
+
+            #endregion
 
             app.MapGet("/", (request) =>
             {

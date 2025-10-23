@@ -16,10 +16,5 @@ namespace Localhost.AI.Core.Models.Symbolic
         public List<string> Must { get; set; } = new List<string>();
         public List<string> MustNot { get; set; } = new List<string>();
         public string SystemPrompt { get; set; } = string.Empty;
-
     }
-
-
-
-
 }

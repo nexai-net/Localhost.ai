@@ -387,6 +387,74 @@
 
         }
 
+        public List<Cv> SearchCV(string key)
+        {
+            List<Cv> cvs;
+            key = key.Replace("\n", "");
+            int from = 0;
+            int size = 25;
+            try
+            {
+                var uri = new Uri(_ESconfig.Url);
+                string indexName = "";
+                bool hasPassword = false;
+                // check as a password 
+                if (_ESconfig.Password != null && _ESconfig.User != null)
+                {
+                    if (_ESconfig.Password.Length > 0 && _ESconfig.User.Length > 0)
+                    {
+                        hasPassword = true;
+                    }
+                }
+                var settings = new ConnectionSettings();
+                indexName = _ESconfig.Prefix + typeof(Cache).Name.ToLower();
+
+                if (hasPassword)
+                {
+                    settings = new ConnectionSettings(uri).BasicAuthentication(_ESconfig.User, _ESconfig.Password)
+                    .DefaultIndex(indexName);
+                }
+                else
+                {
+                    settings = new ConnectionSettings(new Uri(_ESconfig.Url)).DefaultIndex(indexName);
+                }
+                var client = new ElasticClient(settings);
+
+                ISearchResponse<Cv> response;
+                if (!string.IsNullOrWhiteSpace(key))
+                {
+                    // 🔎 Full text search across multiple fields
+                    response = client.Search<Cv>(s => s
+                        .Index("cv")
+                        .Size(10000)
+                        .Query(q => q.MultiMatch(m => m
+                            .Query(key).Fields(f => f.Field("*"))
+
+                        ))
+                    );
+                }
+                else
+                {
+                    // 📋 No criteria → return last 10k docs ordered by Date
+                    response = client.Search<Cv>(s => s
+                        .Index("cv")
+                        .Size(10000)
+                        .Sort(ss => ss
+                            .Descending(f => f.Date)
+                        )
+                        .Query(q => q.MatchAll())
+                    );
+                }
+                //TODO - Extend the search method
+                return response.Documents.ToList();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
         public List<Cache> SearchAllInCache(string key)
         {
             List<Cache> caches;

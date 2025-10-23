@@ -219,11 +219,7 @@
             }
         }
 
-        /// <summary>
-        /// Loads an entity from the data repository by its unique identifier.
-        /// </summary>
-        /// <param criteria="id">The unique identifier of the entity to load.</param>
-        /// <returns>The loaded Entity object, or null if not found or an error occurs.</returns>
+
         public Entity EntityLoad(string id)
         {
             // Create a new Entity object as default
@@ -260,6 +256,31 @@
 
                 // Cast the result to Entity type
                 e = (SymbolicEncoder)ret;
+
+                // Return the loaded entity
+                return e;
+            }
+            catch (Exception ex)
+            {
+                // Log the error to console
+                Console.WriteLine(ex.ToString());
+
+                // Return null if loading failed
+                return null;
+            }
+        }
+
+        public SymbolicProcessor SymbolicProcessorLoad(string id)
+        {
+            // Create a new Entity object as default
+            SymbolicProcessor e = new SymbolicProcessor();
+            try
+            {
+                // Load the entity from ElasticSearch using the provided ID
+                var ret = ElasticSearchServer.Load<SymbolicProcessor>(id);
+
+                // Cast the result to Entity type
+                e = (SymbolicProcessor)ret;
 
                 // Return the loaded entity
                 return e;
@@ -325,12 +346,7 @@
             }
         }
 
-        /// <summary>
-        /// 
-        /// 
-        /// </summary>
-        /// <param criteria="c"></param>
-        /// <returns></returns>
+
         public string CacheSave(Cache c)
         {
             // Initialize return string
@@ -352,6 +368,27 @@
             return ret;
         }
 
+
+        public string SymbolicProcessorSave(SymbolicProcessor c)
+        {
+            // Initialize return string
+            string ret = "";
+            try
+            {
+                // Save the cache object to ElasticSearch and get the returned ID
+                ret = ElasticSearchServer.Save<SymbolicProcessor>(c);
+            }
+            catch (Exception ex)
+            {
+                // Log the error to console
+                Console.WriteLine(ex.ToString());
+
+                // Set return value to empty string on error
+                ret = "";
+            }
+            // Return the ID or empty string
+            return ret;
+        }
 
         public string SymbolicEncoderSave(SymbolicEncoder c)
         {
@@ -396,13 +433,7 @@
         }
 
 
-        /// <summary>
-        /// Saves a log entry to the admin repository.
-        /// </summary>
-        /// <param criteria="comment">The log message or comment.</param>
-        /// <param criteria="appName">The criteria of the application generating the log.</param>
-        /// <param criteria="type">The type of log entry (INFO, ERROR, WARNING, etc.).</param>
-        /// <returns>The unique identifier of the saved log entry.</returns>
+
         public string LogSave(string comment, string appName, string type            )
         {
             // Create a new Log object with provided parameters
@@ -419,15 +450,16 @@
             // Save the log to the admin repository and return the ID
             return ElasticSearchAdmin.Save<Log>(log);
         }
+  
 
-        public string SymbolicProcessorSave(SymbolicProcessor sp)
+        public string CvSave(Cv cv)
         {
             // Initialize return string
             string ret = "";
             try
             {
-                // Save the symbolic processor to ElasticSearch and get the returned ID
-                ret = ElasticSearchServer.Save(sp);
+                // Save the CV to ElasticSearch and get the returned ID
+                ret = ElasticSearchServer.Save<Cv>(cv);
             }
             catch (Exception ex)
             {
@@ -439,6 +471,94 @@
             }
             // Return the ID or empty string
             return ret;
+        }
+
+        public string CvUpdate(Cv cv)
+        {
+            // Initialize return string
+            string ret = "";
+            try
+            {
+                // Update the CV in ElasticSearch and get the returned ID
+                ret = ElasticSearchServer.Save<Cv>(cv);
+            }
+            catch (Exception ex)
+            {
+                // Log the error to console
+                Console.WriteLine(ex.ToString());
+                // Set return value to empty string on error
+                ret = "";
+            }
+            // Return the ID or empty string
+            return ret;
+        }
+
+        public string CvDelete(string id)
+        {
+            // Initialize return string
+            string ret = "";
+            try
+            {
+                // Delete the CV from ElasticSearch using its ID
+                ElasticSearchServer.DeleteImpl<Cv>(id);
+                ret = "CV deleted";
+            }
+            catch (Exception ex)
+            {
+                // Log the error to console
+                Console.WriteLine(ex.ToString());
+                // Set return value to empty string on error
+                ret = "";
+            }
+            // Return the ID or empty string
+            return ret;
+        }
+
+        public Cv CvLoad(string id)
+        {
+            // Create a new Cv object as default
+            Cv c = new Cv();
+            try
+            {
+                // Load the CV from ElasticSearch using the provided ID
+                var ret = ElasticSearchServer.Load<Cv>(id);
+                
+                // Cast the result to Cv type
+                c = (Cv)ret;
+                
+                // Return the loaded CV
+                return c;
+            }
+            catch (Exception ex)
+            {
+                // Log the error to console
+                Console.WriteLine(ex.ToString());
+                
+                // Return null if loading failed
+                return null;
+            }
+        }
+
+
+        public List<Cv> CvSearch(string criteria)
+        {
+            // Initialize return string
+            List<Cv> ret = new List<Cv>();
+            try
+            {
+                // Save the search process to ElasticSearch and get the returned ID
+                ret = ElasticSearchServer.SearchCV(criteria);
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                // Log the error to console
+                Console.WriteLine(ex.ToString());
+                // Set return value to empty string on error
+                return null;
+            }
+            // Return the ID or empty string
+            
         }
 
         public string SearchProcessSave(SearchFull sp)
@@ -752,7 +872,7 @@
             // Return the list of found caches
             return ret;
         }
-
+        
         public List<SymbolicProcessor> SymbolicProcessorsSearch(string name)
         {
             // Initialize the result list
